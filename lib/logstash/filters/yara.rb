@@ -16,7 +16,7 @@ class LogStash::Filters::Yara < LogStash::Filters::Base
   config :file,         :validate => :string,   :default => "[path]"
   #config :target,       :validate => :string,   :default => "yara"
   config :score_name,   :validate => :string,   :default => "fb_yara"
-  config :weight,       :default => 100.0
+  config :weight,       :default => 1.0
   config :latency_name, :validate => :string,   :default => "yara_latency"
 
 
