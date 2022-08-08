@@ -1,1 +1,1 @@
-# logstash-filter-cuckoo
+# logstash-filter-yara
