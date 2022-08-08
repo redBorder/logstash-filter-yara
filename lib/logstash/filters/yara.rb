@@ -16,7 +16,9 @@ class LogStash::Filters::Yara < LogStash::Filters::Base
   config :file,         :validate => :string,   :default => "[path]"
   #config :target,       :validate => :string,   :default => "yara"
   config :score_name,   :validate => :string,   :default => "fb_yara"
-  config :weight,       :default => 1.0
+  config :weight,       :default => 100.0
+  config :latency_name, :validate => :string,   :default => "yara_latency"
+
 
   DELAYED_REALTIME_TIME = 15
 
@@ -34,11 +36,18 @@ class LogStash::Filters::Yara < LogStash::Filters::Base
 
     starting_time = Process.clock_gettime(Process::CLOCK_MONOTONIC)
 
-    yara_score = `@yara_path -c -w @yara_rule @path`.to_i
+    det_rules = []
+    yara_result = `#{@yara_path} -w #{@yara_rule} #{@path}`
+
+    det_rules = yara_result.split("\n").map! { |rule| rule.split(" ").first } if !yara_result.empty?
+
+    yara_score = (det_rules.length * @weight).round
+
 
     ending_time  = Process.clock_gettime(Process::CLOCK_MONOTONIC)
     elapsed_time = (ending_time - starting_time).round(1)
-    event.set('yara_latency', elapsed_time)
+    event.set(@latency_name, elapsed_time)
+    event.set('detected_rules',det_rules)
 
     #event.set(@target,)
     event.set(@score_name,yara_score)
