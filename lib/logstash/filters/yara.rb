@@ -17,7 +17,7 @@ class LogStash::Filters::Yara < LogStash::Filters::Base
   config :score_name,   :validate => :string,   :default => "fb_yara"
   config :weight,       :default => 1.0
   config :latency_name, :validate => :string,   :default => "yara_latency"
-  config :target, :validate => :string, :default => "yara"
+  config :target,       :validate => :string,   :default => "yara"
 
   DELAYED_REALTIME_TIME = 15
 

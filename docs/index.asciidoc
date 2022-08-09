@@ -14,45 +14,99 @@ END - GENERATED VARIABLES, DO NOT EDIT!
 
 [id="plugins-{type}s-{plugin}"]
 
+== logstash-filter-yara
+
 === Example filter plugin
 
-include::{include_path}/plugin_header.asciidoc[]
+[,logstash]
+----
+filter{
+  yara {
+    yara_rule => '/opt/rb/var/yara_rules/rules.yara'
+    yara_path => '/opt/rb/bin/yara'
+    file => '[path]'
+    score_name => 'fb_yara'
+    weight => 1.0
+    target => 'yara'
+    latency_name => 'yara_latency'
+  }
+}
+----
 
-==== Description
+=== Description
 
-ADD DESCRIPTION HERE
+This is an example of Logstash filter plugin for Yara.
+
 
 [id="plugins-{type}s-{plugin}-options"]
-==== Example Filter Configuration Options
-
-This plugin supports the following configuration options plus the <<plugins-{type}s-{plugin}-common-options>> described later.
+==== Filter Configuration Options
 
 [cols="<,<,<",options="header",]
 |=======================================================================
 |Setting |Input type|Required
-| <<plugins-{type}s-{plugin}-setting_name>> |{logstash-ref}/configuration-file-structure.html#boolean[boolean]|No
-| <<plugins-{type}s-{plugin}-another_setting_name>> |{logstash-ref}/configuration-file-structure.html#hash[hash]|No
+| <<plugins-{type}s-{plugin}-yara_rule>> |String|No
+| <<plugins-{type}s-{plugin}-yara_path>> |String|No
+| <<plugins-{type}s-{plugin}-file>> |String|No
+| <<plugins-{type}s-{plugin}-score_name>> |String|No
+| <<plugins-{type}s-{plugin}-weight>> |Float|No
+| <<plugins-{type}s-{plugin}-target>> |String|No
+| <<plugins-{type}s-{plugin}-latency_name>> |String|No
 |=======================================================================
 
-Also see <<plugins-{type}s-{plugin}-common-options>> for a list of options supported by all
-filter plugins.
+[id="plugins-{type}s-{plugin}-yara_rule"]
+===== `yara_rule`
 
-[id="plugins-{type}s-{plugin}-setting_name"]
-===== `setting_name` 
+* Value type is `String`.
+* Default value is `"/opt/rb/var/yara_rules/rules.yara"`
 
-  * Value type is {logstash-ref}/configuration-file-structure.html#boolean[boolean]
-  * Default value is `true`
+Path where yara rules is located.
 
-ADD DESCRIPTION HERE.
+[id="plugins-{type}s-{plugin}-yara_path"]
+===== `yara_path`
 
-[id="plugins-{type}s-{plugin}-another_setting_name"]
-===== `another_setting_name` 
+* Value type is `String`.
+* Default value is `"/opt/rb/bin/yara"`
 
-  * Value type is <<hash,hash>>
-  * Default value is `{}`
+Path where Yara binary is located.
 
-ADD DESCRIPTION HERE.
+[id="plugins-{type}s-{plugin}-file"]
+===== `file`
 
+* Value type is `String`.
+* Default value is `"[path]"`
+
+Logstash event field (key) where the file to be analyzed is located.
+
+[id="plugins-{type}s-{plugin}-score_name"]
+===== `score_name`
+
+* Value type is `String`.
+* Default value is `"fb_yara"`
+
+Logstash event field (key) where the score is going to be located.
+
+[id="plugins-{type}s-{plugin}-weight"]
+===== `weight`
+
+* Value type is `Float`.
+* Default value is `1.0`
+
+Malware score is 100 if Yara tag the file as a virus. If not, score is 0.
+
+[id="plugins-{type}s-{plugin}-latency_name"]
+===== `latency_name`
+
+* Value type is `String`.
+* Default value is `"yara_latency"`
+
+Logstash event field (key) where the latency is going to be located.
+
+[id="plugins-{type}s-{plugin}-target"]
+===== `target`
+
+* Value type is `String`.
+* Default value is `"yara"`
+
+Logstash event field (key) where the JSON is going to be located.
 
 [id="plugins-{type}s-{plugin}-common-options"]
-include::{include_path}/{type}.asciidoc[]
