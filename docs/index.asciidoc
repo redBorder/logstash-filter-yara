@@ -91,7 +91,7 @@ Logstash event field (key) where the score is going to be located.
 * Value type is `Float`.
 * Default value is `1.0`
 
-Malware score is 100 if Yara tag the file as a virus. If not, score is 0.
+The malware score depends on how many yara rules are detected. If it doesn't detect any, the score is 0.
 
 [id="plugins-{type}s-{plugin}-latency_name"]
 ===== `latency_name`
