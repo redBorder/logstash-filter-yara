@@ -23,7 +23,7 @@ END - GENERATED VARIABLES, DO NOT EDIT!
 filter{
   yara {
     yara_rule => '/opt/rb/var/yara_rules/rules.yara'
-    yara_path => '/opt/rb/bin/yara'
+    yara_bin => '/opt/rb/bin/yara'
     file => '[path]'
     score_name => 'fb_yara'
     weight => 1.0
@@ -45,7 +45,7 @@ This is an example of Logstash filter plugin for Yara.
 |=======================================================================
 |Setting |Input type|Required
 | <<plugins-{type}s-{plugin}-yara_rule>> |String|No
-| <<plugins-{type}s-{plugin}-yara_path>> |String|No
+| <<plugins-{type}s-{plugin}-yara_bin>> |String|No
 | <<plugins-{type}s-{plugin}-file>> |String|No
 | <<plugins-{type}s-{plugin}-score_name>> |String|No
 | <<plugins-{type}s-{plugin}-weight>> |Float|No
@@ -61,8 +61,8 @@ This is an example of Logstash filter plugin for Yara.
 
 Path where yara rules is located.
 
-[id="plugins-{type}s-{plugin}-yara_path"]
-===== `yara_path`
+[id="plugins-{type}s-{plugin}-yara_bin"]
+===== `yara_bin`
 
 * Value type is `String`.
 * Default value is `"/opt/rb/bin/yara"`
