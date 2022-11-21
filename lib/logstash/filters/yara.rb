@@ -98,8 +98,6 @@ class LogStash::Filters::Yara < LogStash::Filters::Base
     py_json = JSON.parse(command)
     matches = py_json["matches"]
 
-    severity = ""
-    rule = ""
     rules = []
 
     matches.each do |n|
@@ -108,12 +106,10 @@ class LogStash::Filters::Yara < LogStash::Filters::Base
       severity = meta["severity"]
       rule = n["rule"]
       rules<<rule
-      #severity = nil
 
 
       if severity.nil?
         hits[low_severity] += 1
-        #hits[severity] = 0
         next
       end
 
@@ -127,17 +123,11 @@ class LogStash::Filters::Yara < LogStash::Filters::Base
       end
     end
 
-    yara_score = matches.length()
 
     final_score = 0.0
 
     sev = YAML.load_file("#{@yara_weights}")
 
-
-    general = sev["general"]
-    high = sev["high"]
-    medium = sev["medium"]
-    low = sev["low"]
 
     if (!(hits[high_severity] == 0 and hits[medium_severity] == 0 and hits[low_severity] == 0))
 
@@ -160,14 +150,12 @@ class LogStash::Filters::Yara < LogStash::Filters::Base
     end
 
     yara_json = {
-      "Rules" => rules,
-      "Score" => final_score,
-      "File" => @file_path,
       "Hits" => hits,
+      "yara_rules" => matches,
       "Weight" => weighing
     }
 
-    [yara_json, yara_score]
+    [yara_json, final_score.round]
   end
 
   public
@@ -189,14 +177,18 @@ class LogStash::Filters::Yara < LogStash::Filters::Base
     end
 
     starting_time = Process.clock_gettime(Process::CLOCK_MONOTONIC)
-    yara_result,yara_score = get_yara_info
+    yara_result,final_score = get_yara_info
 
     ending_time  = Process.clock_gettime(Process::CLOCK_MONOTONIC)
     elapsed_time = (ending_time - starting_time).round(1)
 
+    timestamp = Time.now.to_i
+    event.set("timestamp",timestamp)
+
     event.set(@latency_name, elapsed_time)
     event.set(@target,yara_result)
-    event.set(@score_name,yara_score)
+    event.set("loader",@target)
+    event.set(@score_name,final_score)
 
 
     # filter_matched should go in the last line of our successful code
