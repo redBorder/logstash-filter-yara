@@ -62,8 +62,6 @@ class LogStash::Filters::Yara < LogStash::Filters::Base
     yara_info = {}
 
 
-    # exceptions - start
-
     unless File.exist?(@pyyara_py)
       @logger.error("Script Yara - pyyara.py - is not in #{@pyyara_py}.")
       return [yara_info, yara_score]
@@ -79,18 +77,11 @@ class LogStash::Filters::Yara < LogStash::Filters::Base
       return [yara_info, yara_score]
     end
 
-    # exceptions - end
-
 
     hits={}
     scores={}
 
-    command = `#{@pyyara_py} #{@file_field}`
-    result = `#{command}`
-
-    #HIGH_SEVERITY = "high"
-    #MEDIUM_SEVERITY = "medium"
-    #LOW_SEVERITY = "low"
+    command = `#{@pyyara_py} #{@file_path}`
 
 
     high_severity = "high"
@@ -104,17 +95,19 @@ class LogStash::Filters::Yara < LogStash::Filters::Base
       scores[severity] = 0
     end
 
-    py_json = JSON.parse(result)
+    py_json = JSON.parse(command)
     matches = py_json["matches"]
 
     severity = ""
     rule = ""
+    rules = []
 
     matches.each do |n|
 
       meta = n["meta"]
-      severity = n["meta"]["severity"]
+      severity = meta["severity"]
       rule = n["rule"]
+      rules<<rule
       #severity = nil
 
 
@@ -140,6 +133,7 @@ class LogStash::Filters::Yara < LogStash::Filters::Base
 
     sev = YAML.load_file("#{@yara_weights}")
 
+
     general = sev["general"]
     high = sev["high"]
     medium = sev["medium"]
@@ -148,7 +142,6 @@ class LogStash::Filters::Yara < LogStash::Filters::Base
     if (!(hits[high_severity] == 0 and hits[medium_severity] == 0 and hits[low_severity] == 0))
 
       severities.each do |severity|
-
         if hits[severity] > sev[severity]["high_lower_threshold"]
           scores[severity] = sev[severity]["high_score"]
         elsif (hits[severity] < sev[severity]["low_upper_threshold"] and hits[severity] > 0)
@@ -159,26 +152,19 @@ class LogStash::Filters::Yara < LogStash::Filters::Base
       end
     end
 
-
+    weighing = 0.0
     severities.each do |severity|
       weighing = sev["general"][severity]
       score = scores[severity]
       final_score += weighing * score
     end
 
-    rules = []
-    matches.each do |n|
-      rule = n["rule"]
-      rules<<rule
-    end
-
-
     yara_json = {
       "Rules" => rules,
       "Score" => final_score,
-      "File" => @file_field,
+      "File" => @file_path,
       "Hits" => hits,
-      "Match" => matches
+      "Weight" => weighing
     }
 
     [yara_json, yara_score]
@@ -188,7 +174,19 @@ class LogStash::Filters::Yara < LogStash::Filters::Base
 
   def filter(event)
 
-    @path = event.get(@file_field)
+    @file_path = event.get(@file_field)
+    @logger.info("[#{@target}] processing #{@file_path}")
+
+    @hash = event.get('sha256')
+
+    if @hash.nil?
+      begin
+        @hash = Digest::SHA2.new(256).hexdigest File.read @file_path
+        event.set('sha256', @hash)
+      rescue Errno::ENOENT => ex
+        @logger.error(ex.message)
+      end
+    end
 
     starting_time = Process.clock_gettime(Process::CLOCK_MONOTONIC)
     yara_result,yara_score = get_yara_info
