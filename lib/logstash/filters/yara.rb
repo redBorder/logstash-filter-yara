@@ -36,6 +36,10 @@ class LogStash::Filters::Yara < LogStash::Filters::Base
   config :aerospike_server,           :validate => :string,         :default => ""
   # Namespace is a Database name in Aerospike
   config :aerospike_namespace,        :validate => :string,         :default => "malware"
+  # path of yara rules
+  config :path_yara_rules,            :validate => :string,         :default => "/usr/share/logstash/yara_rules/"
+  # path of weights
+  config :weights,                    :validate => :string,         :default => "/opt/rb/var/rb-sequence-oozie/conf/weights.yml"
 
 
   DELAYED_REALTIME_TIME = 15
@@ -81,7 +85,7 @@ class LogStash::Filters::Yara < LogStash::Filters::Base
     hits={}
     scores={}
 
-    command = `#{@pyyara_py} #{@file_path}`
+    command = `#{@pyyara_py} #{@file_path} #{@path_yara_rules}`
 
 
     high_severity = "high"
@@ -123,7 +127,6 @@ class LogStash::Filters::Yara < LogStash::Filters::Base
       end
     end
 
-
     final_score = 0.0
 
     sev = YAML.load_file("#{@yara_weights}")
@@ -142,17 +145,19 @@ class LogStash::Filters::Yara < LogStash::Filters::Base
       end
     end
 
-    weighing = 0.0
     severities.each do |severity|
       weighing = sev["general"][severity]
       score = scores[severity]
       final_score += weighing * score
     end
 
+    w = YAML.load_file("#{@weights}")
+    weight_yara = w["hash"]["fb_yara"]
+
     yara_json = {
       "Hits" => hits,
       "yara_rules" => matches,
-      "Weight" => weighing
+      "Weight" => weight_yara
     }
 
     [yara_json, final_score.round]
