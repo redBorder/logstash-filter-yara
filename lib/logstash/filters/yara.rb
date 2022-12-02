@@ -81,7 +81,12 @@ class LogStash::Filters::Yara < LogStash::Filters::Base
       return [yara_info, yara_score]
     end
 
+    unless File.exist?(@path_yara_rules)
+      @logger.error("Yara rules is not in #{@path_yara_rules}.")
+      return [yara_info, yara_score]
+    end
 
+    
     hits={}
     scores={}
 
