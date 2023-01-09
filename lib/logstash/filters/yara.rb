@@ -38,6 +38,8 @@ class LogStash::Filters::Yara < LogStash::Filters::Base
   config :aerospike_namespace,        :validate => :string,         :default => "malware"
   # path of yara rules
   config :path_yara_rules,            :validate => :string,         :default => "/usr/share/logstash/yara_rules/"
+  # file of yara rules
+  config :file_yara_rules,            :validate => :string,         :default => "/usr/share/logstash/yara_rules/rules.yara"
   # path of weights
   config :weights,                    :validate => :string,         :default => "/opt/rb/var/rb-sequence-oozie/conf/weights.yml"
 
@@ -62,28 +64,33 @@ class LogStash::Filters::Yara < LogStash::Filters::Base
 
   def get_yara_info
 
-    yara_score = -1
+    final_score = -1
     yara_info = {}
 
 
     unless File.exist?(@pyyara_py)
       @logger.error("Script Yara - pyyara.py - is not in #{@pyyara_py}.")
-      return [yara_info, yara_score]
+      return [yara_info, final_score]
     end
 
     unless File.exist?(@yara_weights)
-      @logger.error("File #{@yara_weights} does not exist.")
-      return [yara_info, yara_score]
+      @logger.error("The file #{@yara_weights} does not exist.")
+      return [yara_info, final_score]
     end
 
     unless File.exist?(@python)
       @logger.error("Python is not in #{@python}.")
-      return [yara_info, yara_score]
+      return [yara_info, final_score]
     end
 
     unless File.exist?(@path_yara_rules)
-      @logger.error("Yara rules is not in #{@path_yara_rules}.")
-      return [yara_info, yara_score]
+      @logger.error("Directory #{@path_yara_rules} does not exist.")
+      return [yara_info, final_score]
+    end
+
+    unless File.exist?(@file_yara_rules)
+      @logger.error("The file #{@file_yara_rules} does not exist.")
+      return [yara_info, final_score]
     end
 
     
