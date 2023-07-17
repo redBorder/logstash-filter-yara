@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name = 'logstash-filter-yara'
-  s.version = '0.0.2'
+  s.version = '0.0.3'
   s.licenses = ['GNU AFFERO GENERAL PUBLIC LICENSE']
   s.summary = "plugin to manage yara data pipeline"
   s.description = "This gem is a Logstash plugin required to be installed on top of the Logstash core pipeline using $LS_HOME/bin/logstash-plugin install gemname. This gem is not a stand-alone program"

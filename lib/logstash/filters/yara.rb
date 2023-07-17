@@ -97,9 +97,6 @@ class LogStash::Filters::Yara < LogStash::Filters::Base
     hits={}
     scores={}
 
-    command = `#{@pyyara_py} #{@file_path} #{@path_yara_rules}`
-
-
     high_severity = "high"
     medium_severity = "medium"
     low_severity = "low"
@@ -111,8 +108,15 @@ class LogStash::Filters::Yara < LogStash::Filters::Base
       scores[severity] = 0
     end
 
-    py_json = JSON.parse(command)
-    matches = py_json["matches"]
+    yara_exec_error = false
+    begin
+      command = `#{@pyyara_py} #{@file_path} #{@path_yara_rules}`
+      py_json = JSON.parse(command)
+      matches = py_json["matches"]
+    rescue
+      yara_exec_error = true
+      @logger.error("Yara encountered an error while calculating matches for this file, please review your rules and try again!")
+    end
 
     rules = []
 
@@ -139,7 +143,7 @@ class LogStash::Filters::Yara < LogStash::Filters::Base
       end
     end
 
-    final_score = 0.0
+    error == false ? final_score = 0.0 : final_score = -1
 
     sev = YAML.load_file("#{@yara_weights}")
 
