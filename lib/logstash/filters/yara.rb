@@ -108,7 +108,9 @@ class LogStash::Filters::Yara < LogStash::Filters::Base
       scores[severity] = 0
     end
 
+    matches = []
     yara_exec_error = false
+    
     begin
       command = `#{@pyyara_py} #{@file_path} #{@path_yara_rules}`
       py_json = JSON.parse(command)
