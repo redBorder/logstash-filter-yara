@@ -4,17 +4,13 @@ require "logstash/namespace"
 
 require 'json'
 require 'time'
-require 'aerospike'
 require 'text'
 require 'yaml'
 
 require_relative "util/yara_constant"
-require_relative "util/aerospike_config"
-require_relative "util/aerospike_manager"
 
 class LogStash::Filters::Yara < LogStash::Filters::Base
   include YaraConstant
-  include Aerospike
 
   config_name "yara"
 
@@ -32,10 +28,6 @@ class LogStash::Filters::Yara < LogStash::Filters::Base
   config :pyyara_py,                  :validate => :string,         :default => "/opt/rb/var/rb-sequence-oozie/workflow/lib/scripts/pyyara.py"
   # Path of yara_weights
   config :yara_weights,               :validate => :string,         :default => "/opt/rb/var/rb-sequence-oozie/workflow/yara_loader.yml"
-  # Aerospike server in the form "host:port"
-  config :aerospike_server,           :validate => :string,         :default => ""
-  # Namespace is a Database name in Aerospike
-  config :aerospike_namespace,        :validate => :string,         :default => "malware"
   # path of yara rules
   config :path_yara_rules,            :validate => :string,         :default => "/usr/share/logstash/yara_rules/"
   # file of yara rules
@@ -49,15 +41,7 @@ class LogStash::Filters::Yara < LogStash::Filters::Base
   public
   def register
     # Add instance variables
-    begin
-      @aerospike_server = AerospikeConfig::servers if @aerospike_server.empty?
-      @aerospike_server = @aerospike_server[0] if @aerospike_server.class.to_s == "Array"
-      host,port = @aerospike_server.split(":")
-      @aerospike = Client.new(Host.new(host, port))
 
-    rescue Aerospike::Exceptions::Aerospike => ex
-      @logger.error(ex.message)
-    end
   end # def register
 
   private
