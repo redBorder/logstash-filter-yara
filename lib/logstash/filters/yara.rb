@@ -101,7 +101,7 @@ class LogStash::Filters::Yara < LogStash::Filters::Base
       matches = py_json["matches"]
     rescue
       yara_exec_error = true
-      @logger.error("Yara encountered an error while calculating matches for this file, please review your rules and try again!")
+      @logger.error "Yara encountered an error while calculating matches for this file, please review your rules and try again!"
     end
 
     rules = []
@@ -129,7 +129,7 @@ class LogStash::Filters::Yara < LogStash::Filters::Base
       end
     end
 
-    error == false ? final_score = 0.0 : final_score = -1
+    yara_exec_error == false ? final_score = 0.0 : final_score = -1
 
     sev = YAML.load_file("#{@yara_weights}")
 
