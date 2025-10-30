@@ -15,7 +15,7 @@ class LogStash::Filters::Yara < LogStash::Filters::Base
   config_name "yara"
 
   # Python path
-  config :python,                     :validate => :string,         :default => "/usr/bin/python2.6"
+  config :python,                     :validate => :string,         :default => "/usr/bin/python3"
   # File that is going to be analyzed
   config :file_field,                 :validate => :string,         :default => "[path]"
   # Where you want the score to be placed
