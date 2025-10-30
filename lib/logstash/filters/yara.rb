@@ -25,16 +25,15 @@ class LogStash::Filters::Yara < LogStash::Filters::Base
   # Where you want the data to be placed
   config :target,                     :validate => :string,         :default => "yara"
   # Pyyara python script path
-  config :pyyara_py,                  :validate => :string,         :default => "/opt/rb/var/rb-sequence-oozie/workflow/lib/scripts/pyyara.py"
+  config :pyyara_py,                  :validate => :string,         :default => "/usr/lib/redborder/tools/pyyara.py"
   # Path of yara_weights
-  config :yara_weights,               :validate => :string,         :default => "/opt/rb/var/rb-sequence-oozie/workflow/yara_loader.yml"
+  config :yara_weights,               :validate => :string,         :default => "/usr/share/logstash/yara_loader.yml"
   # path of yara rules
   config :path_yara_rules,            :validate => :string,         :default => "/usr/share/logstash/yara_rules/"
   # file of yara rules
   config :file_yara_rules,            :validate => :string,         :default => "/usr/share/logstash/yara_rules/rules.yara"
   # path of weights
-  config :weights,                    :validate => :string,         :default => "/opt/rb/var/rb-sequence-oozie/conf/weights.yml"
-
+  config :weights,                    :validate => :string,         :default => "/usr/share/logstash/weights.yml"
 
   DELAYED_REALTIME_TIME = 15
 
