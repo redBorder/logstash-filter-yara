@@ -25,14 +25,13 @@ filter{
     file_field => '[path]'
     score_name => 'fb_yara'
     target => 'yara'
-    pyyara_py => '/opt/rb/var/rb-sequence-oozie/workflow/lib/scripts/pyyara.py'
-    yara_weights => '/opt/rb/var/rb-sequence-oozie/workflow/yara_loader.yml'
+    python => '/usr/bin/python3'
+    pyyara_py => '/usr/lib/redborder/tools/pyyara.py'
+    yara_weights => '/usr/share/logstash/yara_loader.yml'
     latency_name => 'yara_latency'
-    aerospike_server => ""
-    aerospike_namespace => "malware"
     path_yara_rules => '/usr/share/logstash/yara_rules/'
     file_yara_rules => '/usr/share/logstash/yara_rules/rules.yara'
-    weights => '/opt/rb/var/rb-sequence-oozie/conf/weights.yml'
+    weights => '/usr/share/logstash/weights.yml'
   }
 }
 ----
@@ -54,8 +53,7 @@ This is an example of Logstash filter plugin for Yara.
 | <<plugins-{type}s-{plugin}-pyyara_py>>            |String         |No
 | <<plugins-{type}s-{plugin}-yara_weights>>         |String         |No
 | <<plugins-{type}s-{plugin}-latency_name>>         |String         |No
-| <<plugins-{type}s-{plugin}-aerospike_server>>     |String         |No
-| <<plugins-{type}s-{plugin}-aerospike_namespace>>  |String         |No
+| <<plugins-{type}s-{plugin}-python>>               |String         |No
 | <<plugins-{type}s-{plugin}-path_yara_rules>>      |String         |No
 | <<plugins-{type}s-{plugin}-file_yara_rules>>      |String         |No
 | <<plugins-{type}s-{plugin}-weights>>              |String         |No
@@ -98,7 +96,7 @@ Logstash event field (key) where the JSON is going to be located.
 ===== `pyyara_py`
 
 * Value type is `String`.
-* Default value is `"/opt/rb/var/rb-sequence-oozie/workflow/lib/scripts/pyyara.py"`
+* Default value is `"/usr/lib/redborder/tools/pyyara.py"`
 
 Logstash event field (key) where the script will be located.
 
@@ -106,25 +104,17 @@ Logstash event field (key) where the script will be located.
 ===== `yara_weights`
 
 * Value type is `String`.
-* Default value is `"/opt/rb/var/rb-sequence-oozie/workflow/yara_loader.yml"`
+* Default value is `"/usr/share/logstash/yara_loader.yml"`
 
 Logstash event field (key) where the weights will be placed.
 
-[id="plugins-{type}s-{plugin}-aerospike_server"]
-===== `aerospike_server`
+[id="plugins-{type}s-{plugin}-python"]
+===== `python`
 
 * Value type is `String`.
-* Default value is `""`
+* Default value is `"/usr/bin/python3"`
 
-Aerospike server in the form "host:port".
-
-[id="plugins-{type}s-{plugin}-aerospike_namespace"]
-===== `aerospike_namespace`
-
-* Value type is `String`.
-* Default value is `"malware"`
-
-Namespace is a Database name in Aerospike.
+Path of the python version.
 
 [id="plugins-{type}s-{plugin}-path_yara_rules"]
 ===== `path_yara_rules`
@@ -146,7 +136,7 @@ Logstash event field (key) where the yara rules file will be located.
 ===== `weights`
 
 * Value type is `String`.
-* Default value is `"/opt/rb/var/rb-sequence-oozie/conf/weights.yml"`
+* Default value is `"/usr/share/logstash/weights.yml"`
 
 Logstash event field (key) where the weight will be located.
 
