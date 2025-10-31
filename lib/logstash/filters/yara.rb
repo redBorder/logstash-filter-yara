@@ -1,4 +1,5 @@
 # encoding: utf-8
+
 require "logstash/filters/base"
 require "logstash/namespace"
 
@@ -7,12 +8,8 @@ require 'time'
 require 'text'
 require 'yaml'
 
-require_relative "util/yara_constant"
-
 class LogStash::Filters::Yara < LogStash::Filters::Base
-  include YaraConstant
-
-  config_name "yara"
+  config_name 'yara'
 
   # Python path
   config :python,                     :validate => :string,         :default => "/usr/bin/python3"
