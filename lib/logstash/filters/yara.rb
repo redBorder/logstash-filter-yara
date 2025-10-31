@@ -5,7 +5,6 @@ require "logstash/namespace"
 
 require 'json'
 require 'time'
-require 'text'
 require 'yaml'
 
 class LogStash::Filters::Yara < LogStash::Filters::Base
